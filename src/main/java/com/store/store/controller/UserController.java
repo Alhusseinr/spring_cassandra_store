@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.bcrypt.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,17 +56,28 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public CollectionModel<EntityModel<User>> allUsers() {
-        List<EntityModel<User>> users = userRepository.findAll().stream().map(userAssembler::toModel).collect(Collectors.toList());
+    public ResponseEntity<CollectionModel<EntityModel<User>>> allUsers() {
+        try{
+            List<EntityModel<User>> users = userRepository.findAll().stream().map(userAssembler::toModel).collect(Collectors.toList());
 
-        return CollectionModel.of(users, linkTo(methodOn(UserController.class).allUsers()).withSelfRel());
+            return ResponseEntity.ok(CollectionModel.of(users, linkTo(methodOn(UserController.class).allUsers()).withSelfRel()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @GetMapping("/user/{id}")
-    public EntityModel<User> getUserById(@PathVariable("id") UUID id) {
-        Optional<User> pulledUser = userRepository.findById(id);
+    public ResponseEntity<EntityModel<User>> getUserById(@PathVariable("id") UUID id) {
+        try {
+            Optional<User> pulledUser = userRepository.findById(id);
 
-        return userAssembler.toModel(pulledUser.get());
+            return ResponseEntity.ok(userAssembler.toModel(pulledUser.get()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private boolean userExists(User user) {
