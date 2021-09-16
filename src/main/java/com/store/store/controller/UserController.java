@@ -39,7 +39,6 @@ public class UserController {
     @PostMapping("/user")
     public ResponseEntity<?> addNewUser(@RequestBody User user) {
         try {
-
             if(userExists(user)) {
                 User newUser = userRepository.save(new User(Uuids.timeBased(), user.getFirstName(), user.getLastName(), user.getEmail(), BCrypt.hashpw(user.getPassword(), BCrypt.gensalt())));
                 addressRepository.save(new Address(Uuids.timeBased(), newUser.getId(), "", "", "", "", ""));
@@ -65,7 +64,6 @@ public class UserController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @GetMapping("/user/{id}")
