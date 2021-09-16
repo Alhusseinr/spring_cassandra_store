@@ -3,8 +3,10 @@ package com.store.store.controller;
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.store.store.assembler.UserAssembler;
 import com.store.store.model.Address;
+import com.store.store.model.Cart;
 import com.store.store.model.User;
 import com.store.store.repository.AddressRepository;
+import com.store.store.repository.CartRepository;
 import com.store.store.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -30,6 +32,9 @@ public class UserController {
     @Autowired
     AddressRepository addressRepository;
 
+    @Autowired
+    CartRepository cartRepository;
+
     private final UserAssembler userAssembler;
 
     public UserController(UserAssembler userAssembler) {
@@ -42,6 +47,7 @@ public class UserController {
             if(userExists(user)) {
                 User newUser = userRepository.save(new User(Uuids.timeBased(), user.getFirstName(), user.getLastName(), user.getEmail(), BCrypt.hashpw(user.getPassword(), BCrypt.gensalt())));
                 addressRepository.save(new Address(Uuids.timeBased(), newUser.getId(), "", "", "", "", ""));
+                cartRepository.save(new Cart(Uuids.timeBased(), newUser.getId()));
                 return ResponseEntity.created(linkTo(methodOn(UserController.class).getUserById(newUser.getId())).toUri()).body(userAssembler.toModel(newUser));
             } else {
                 return ResponseEntity

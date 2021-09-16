@@ -9,14 +9,12 @@ import java.util.UUID;
 public class Cart {
     private @PrimaryKey UUID id;
     private UUID userId;
-    private UUID cartItemsId;
 
     public Cart() {}
 
-    public Cart(UUID id, UUID userId, UUID cartItemsId) {
+    public Cart(UUID id, UUID userId) {
         this.id = id;
         this.userId = userId;
-        this.cartItemsId = cartItemsId;
     }
 
     public UUID getId() {
@@ -35,20 +33,11 @@ public class Cart {
         this.userId = userId;
     }
 
-    public UUID getCartItemsId() {
-        return cartItemsId;
-    }
-
-    public void setCartItemsId(UUID cartItemsId) {
-        this.cartItemsId = cartItemsId;
-    }
-
     @Override
     public String toString() {
         return "Cart{" +
                 "id=" + id +
                 ", userId=" + userId +
-                ", cartItemsId=" + cartItemsId +
                 '}';
     }
 }

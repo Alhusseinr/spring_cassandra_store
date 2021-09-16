@@ -2,6 +2,7 @@ package com.store.store.controller;
 
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.store.store.assembler.ItemAssembler;
+import com.store.store.model.CartItems;
 import com.store.store.model.Item;
 import com.store.store.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
