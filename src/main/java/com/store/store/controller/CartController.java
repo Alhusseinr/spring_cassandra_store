@@ -4,8 +4,10 @@ import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.store.store.assembler.CartAssembler;
 import com.store.store.model.Cart;
 import com.store.store.model.CartItems;
+import com.store.store.model.Item;
 import com.store.store.repository.CartItemsRepository;
 import com.store.store.repository.CartRepository;
+import com.store.store.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,10 +33,12 @@ public class CartController {
 
     private final CartAssembler cartAssembler;
     private final CartItemsRepository cartItemsRepository;
+    private final ItemRepository itemRepository;
 
-    public CartController(CartAssembler cartAssembler, CartItemsRepository cartItemsRepository) {
+    public CartController(CartAssembler cartAssembler, CartItemsRepository cartItemsRepository, ItemRepository itemRepository) {
         this.cartAssembler = cartAssembler;
         this.cartItemsRepository = cartItemsRepository;
+        this.itemRepository = itemRepository;
     }
 
     @PostMapping("/cart/{userId}")
@@ -92,6 +97,28 @@ public class CartController {
             CartItems cartItem = cartItemsRepository.save(new CartItems(Uuids.timeBased(), cartId, itemId));
 
             return ResponseEntity.ok(EntityModel.of(cartItem));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/cart/getItems/{id}")
+    public ResponseEntity<?> getCartItems(@PathVariable("id") UUID id) {
+        try {
+            List<CartItems> cartItems = cartItemsRepository.findByCartId(id);
+            ArrayList<Item> items = new ArrayList<>();
+            double total = 0;
+
+            for(int i = 0; i < cartItems.size(); i++) {
+                items.add(itemRepository.findById(cartItems.get(i).getItemId()).get());
+            }
+
+            for(Item item : items) {
+                total += item.getItemPrice();
+            }
+
+            return ResponseEntity.ok(items);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

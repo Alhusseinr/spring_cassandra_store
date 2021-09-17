@@ -52,3 +52,7 @@ public class CartItems {
                 '}';
     }
 }
+
+// 4ea0a400-1717-11ec-833e-7f6e83e56e51 item id iphone 13 pro max
+// 85ab6720-172e-11ec-b9c1-cfb430084cdb cart id
+//
