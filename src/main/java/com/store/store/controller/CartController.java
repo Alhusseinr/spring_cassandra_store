@@ -14,10 +14,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -155,20 +152,36 @@ public class CartController {
         }
     }
 
-    private ArrayList<Item> updateItemQty(ArrayList<Item> items, UUID itemId, HashMap<UUID, Integer> map) {
-
-        for(Item item : items) {
-            System.out.println(item.getId() == itemId);
-            if(item.getId() == itemId) {
-                item.setItemQuantity(map.get(item.getId()));
-                System.out.println("inside loop");
-                System.out.println(item);
-            }
-        }
+    private ArrayList<Item> updateItemQty(HashMap<UUID, Integer> itemsInCart) {
+        ArrayList<Item> items = new ArrayList<>();
 
         System.out.println("inside update");
-        System.out.println(items);
 
         return items;
+    }
+
+    @DeleteMapping("/cart/{cartId}/item/{itemId}")
+    public ResponseEntity<?> removeItemFromCart(@PathVariable("cartId") UUID cartId, @PathVariable("itemId") UUID itemId) {
+        try {
+            List<CartItems> cartItems = cartItemsRepository.findByItemId(itemId);
+            CartItems deleteCartItem = null;
+            int count = 0;
+
+            for(CartItems cartItem : cartItems) {
+                if(cartItem.getCartId() == cartId && cartItem.getItemId() == itemId && count < 1) {
+                    count++;
+                    deleteCartItem = cartItem;
+                } else if(count >= 1) {
+                    count++;
+                }
+            }
+
+            cartItemsRepository.delete(deleteCartItem);
+            return ResponseEntity.ok(HttpStatus.OK);
+            
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

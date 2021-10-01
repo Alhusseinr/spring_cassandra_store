@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface CartItemsRepository extends CassandraRepository<CartItems, UUID> {
     @AllowFiltering
     List<CartItems> findByCartId(UUID cartId);
+    List<CartItems> findByItemId(UUID itemId);
 }
